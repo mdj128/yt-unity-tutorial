@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: ff806a100cf22334daca2b2b78eca94d
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 135316
+  packageName: Character Controller SUPER
+  packageVersion: 22.10.9f
+  assetPath: Assets/SUPER Character Controller/Demo Assets/Textures/Skyboxes/DaySky
+    - toon/Skybox.blend1
+  uploadId: 532477
