@@ -32,4 +32,13 @@ public class CollectableCounter : MonoBehaviour
             audioSource.PlayOneShot(soundToPlay,volume);
         }
     }
+
+    public void RemoveFromCount(int amount)
+    {
+        currentCount -= amount;
+        if (currentCount < 0)
+        {
+            currentCount = 0;
+        }
+    }
 }
