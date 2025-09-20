@@ -13,7 +13,6 @@ public class NPCController : MonoBehaviour
 
     private NavMeshAgent agent;
     private Animator animator;
-    private AudioSource audioSource;
     private float lastStealTime;
 
     private enum State
@@ -29,7 +28,6 @@ public class NPCController : MonoBehaviour
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
-        audioSource = GetComponent<AudioSource>();
 
         if (player == null)
         {
@@ -97,9 +95,9 @@ public class NPCController : MonoBehaviour
         if (CollectableCounter.instance != null && CollectableCounter.instance.currentCount > 0)
         {
             CollectableCounter.instance.RemoveFromCount(stealAmount);
-            if (audioSource != null && stealSound != null)
+            if (stealSound != null)
             {
-                audioSource.PlayOneShot(stealSound);
+                BackgroundMusic.instance.PlaySound(stealSound);
             }
         }
     }

@@ -8,6 +8,8 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class BackgroundMusic : MonoBehaviour
 {
+    public static BackgroundMusic instance;
+
     /// <summary>
     /// The audio clip to be played as background music.
     /// </summary>
@@ -37,6 +39,15 @@ public class BackgroundMusic : MonoBehaviour
 
     void Awake()
     {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
         // Get the AudioSource component attached to this GameObject.
         audioSource = GetComponent<AudioSource>();
 
@@ -85,5 +96,14 @@ public class BackgroundMusic : MonoBehaviour
     public void Stop()
     {
         audioSource.Stop();
+    }
+
+    /// <summary>
+    /// Plays a sound effect.
+    /// </summary>
+    /// <param name="clip">The audio clip to play.</param>
+    public void PlaySound(AudioClip clip)
+    {
+        audioSource.PlayOneShot(clip);
     }
 }
