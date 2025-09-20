@@ -24,10 +24,12 @@ public class CollectableCounter : MonoBehaviour
     private void Update(){
         counter.text = currentCount.ToString(format);
     }
-    public void AddToCount(){
+    public void AddToCount(AudioClip overrideSound = null){
         currentCount++;
-        if(audioSource && collectionSound){
-            audioSource.PlayOneShot(collectionSound,volume);
+        AudioClip soundToPlay = overrideSound != null ? overrideSound : collectionSound;
+
+        if(audioSource && soundToPlay){
+            audioSource.PlayOneShot(soundToPlay,volume);
         }
     }
 }

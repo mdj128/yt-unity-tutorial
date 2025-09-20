@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 5f245f896176c8142bea5666a89372dc
+ShaderIncludeImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 243519
+  packageName: Rocks and Vegetation Pack - URP and Built-In
+  packageVersion: 1.0
+  assetPath: Assets/Rocks and Vegetation Pack/Shaders/Vegetation/HLSL/CustomLighting.hlsl
+  uploadId: 553804
