@@ -1,0 +1,60 @@
+# Line endings and text normalization
+* text=auto eol=lf
+
+# Use Unity Smart Merge (YAMLMerge) on YAML-based assets
+*.meta              text eol=lf merge=unityyamlmerge
+*.unity             text eol=lf merge=unityyamlmerge
+*.prefab            text eol=lf merge=unityyamlmerge
+*.anim              text eol=lf merge=unityyamlmerge
+*.controller        text eol=lf merge=unityyamlmerge
+*.overrideController text eol=lf merge=unityyamlmerge
+*.mat               text eol=lf merge=unityyamlmerge
+*.asset             text eol=lf merge=unityyamlmerge
+*.physicMaterial    text eol=lf merge=unityyamlmerge
+*.physicsMaterial2D text eol=lf merge=unityyamlmerge
+*.mask              text eol=lf merge=unityyamlmerge
+*.shadergraph       text eol=lf merge=unityyamlmerge
+*.shadersubgraph    text eol=lf merge=unityyamlmerge
+*.vfx               text eol=lf merge=unityyamlmerge
+*.asmdef            text eol=lf
+
+# Treat source files as text (LF)
+*.cs                text eol=lf
+*.cginc             text eol=lf
+*.hlsl              text eol=lf
+*.shader            text eol=lf
+*.compute           text eol=lf
+*.json              text eol=lf
+*.xml               text eol=lf
+*.yaml              text eol=lf
+*.yml               text eol=lf
+
+# Binary assets (no text diff/merge)
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.tga  binary
+*.tif  binary
+*.tiff binary
+*.psd  binary
+
+*.wav  binary
+*.mp3  binary
+*.ogg  binary
+
+*.fbx  binary
+*.obj  binary
+*.blend binary
+
+*.mp4  binary
+*.mov  binary
+*.avi  binary
+
+*.zip  binary
+*.7z   binary
+*.rar  binary
+*.unitypackage binary
+
+# If you use Git LFS, `git lfs track` will add entries here automatically.
+# Keep this file under version control.
+
