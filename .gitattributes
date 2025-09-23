@@ -2,59 +2,63 @@
 * text=auto eol=lf
 
 # Use Unity Smart Merge (YAMLMerge) on YAML-based assets
-*.meta              text eol=lf merge=unityyamlmerge
-*.unity             text eol=lf merge=unityyamlmerge
-*.prefab            text eol=lf merge=unityyamlmerge
-*.anim              text eol=lf merge=unityyamlmerge
-*.controller        text eol=lf merge=unityyamlmerge
+*.meta               text eol=lf merge=unityyamlmerge
+*.unity              text eol=lf merge=unityyamlmerge
+*.prefab             text eol=lf merge=unityyamlmerge
+*.anim               text eol=lf merge=unityyamlmerge
+*.controller         text eol=lf merge=unityyamlmerge
 *.overrideController text eol=lf merge=unityyamlmerge
-*.mat               text eol=lf merge=unityyamlmerge
-*.asset             text eol=lf merge=unityyamlmerge
-*.physicMaterial    text eol=lf merge=unityyamlmerge
-*.physicsMaterial2D text eol=lf merge=unityyamlmerge
-*.mask              text eol=lf merge=unityyamlmerge
-*.shadergraph       text eol=lf merge=unityyamlmerge
-*.shadersubgraph    text eol=lf merge=unityyamlmerge
-*.vfx               text eol=lf merge=unityyamlmerge
-*.asmdef            text eol=lf
+*.mat                text eol=lf merge=unityyamlmerge
+*.asset              text eol=lf merge=unityyamlmerge
+*.physicMaterial     text eol=lf merge=unityyamlmerge
+*.physicsMaterial2D  text eol=lf merge=unityyamlmerge
+*.mask               text eol=lf merge=unityyamlmerge
+*.shadergraph        text eol=lf merge=unityyamlmerge
+*.shadersubgraph     text eol=lf merge=unityyamlmerge
+*.vfx                text eol=lf merge=unityyamlmerge
+*.asmdef             text eol=lf
 
 # Treat source files as text (LF)
-*.cs                text eol=lf
-*.cginc             text eol=lf
-*.hlsl              text eol=lf
-*.shader            text eol=lf
-*.compute           text eol=lf
-*.json              text eol=lf
-*.xml               text eol=lf
-*.yaml              text eol=lf
-*.yml               text eol=lf
+*.cs                 text eol=lf
+*.cginc              text eol=lf
+*.hlsl               text eol=lf
+*.shader             text eol=lf
+*.compute            text eol=lf
+*.json               text eol=lf
+*.xml                text eol=lf
+*.yaml               text eol=lf
+*.yml                text eol=lf
 
 # Binary assets (no text diff/merge)
-*.png  binary
-*.jpg  binary
-*.jpeg binary
-*.tga  binary
-*.tif  binary
-*.tiff binary
-*.psd  binary
+*.png   filter=lfs diff=lfs merge=lfs -text
+*.jpg   filter=lfs diff=lfs merge=lfs -text
+*.jpeg  filter=lfs diff=lfs merge=lfs -text
+*.tga   filter=lfs diff=lfs merge=lfs -text
+*.tif   filter=lfs diff=lfs merge=lfs -text
+*.tiff  filter=lfs diff=lfs merge=lfs -text
+*.psd   filter=lfs diff=lfs merge=lfs -text
+*.exr   filter=lfs diff=lfs merge=lfs -text
+*.hdr   filter=lfs diff=lfs merge=lfs -text
 
-*.wav  binary
-*.mp3  binary
-*.ogg  binary
+*.wav   filter=lfs diff=lfs merge=lfs -text
+*.mp3   filter=lfs diff=lfs merge=lfs -text
+*.ogg   filter=lfs diff=lfs merge=lfs -text
 
-*.fbx  binary
-*.obj  binary
-*.blend binary
+*.fbx   filter=lfs diff=lfs merge=lfs -text
+*.obj   filter=lfs diff=lfs merge=lfs -text
+*.blend filter=lfs diff=lfs merge=lfs -text
 
-*.mp4  binary
-*.mov  binary
-*.avi  binary
+*.mp4   filter=lfs diff=lfs merge=lfs -text
+*.mov   filter=lfs diff=lfs merge=lfs -text
+*.avi   filter=lfs diff=lfs merge=lfs -text
 
-*.zip  binary
-*.7z   binary
-*.rar  binary
-*.unitypackage binary
+*.ttf   filter=lfs diff=lfs merge=lfs -text
+*.otf   filter=lfs diff=lfs merge=lfs -text
+
+*.zip   filter=lfs diff=lfs merge=lfs -text
+*.7z    filter=lfs diff=lfs merge=lfs -text
+*.rar   filter=lfs diff=lfs merge=lfs -text
+*.unitypackage filter=lfs diff=lfs merge=lfs -text
 
 # If you use Git LFS, `git lfs track` will add entries here automatically.
 # Keep this file under version control.
-
