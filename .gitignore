@@ -32,6 +32,7 @@
 .idea/
 .vscode/
 *.DotSettings.user
+bin/
 
 # OS files
 .DS_Store
