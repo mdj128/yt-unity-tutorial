@@ -35,7 +35,7 @@ The current build includes:
 
 ## 🚀 Getting Started  
 1. Clone this repository or download the latest release zip.  
-2. Open the project in **Unity (2023.x or newer)**.  
+2. Open the project in **Unity (6.2 or newer)**.  
 3. Make sure you’ve installed the required Unity modules (3D, URP).  
 4. Run the project in the editor or build it for your platform.  
 
