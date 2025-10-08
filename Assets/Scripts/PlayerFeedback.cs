@@ -1,44 +1,56 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
 
 public class PlayerFeedback : MonoBehaviour
 {
     public static PlayerFeedback instance;
 
-    [Header("Screen Blink")]
-    public Image blinkImage;
-    public float blinkDuration = 0.1f;
-    public Color blinkColor = new Color(1, 0, 0, 0.5f);
-
     [Header("Camera Shake")]
-    public float shakeDuration = 0.2f;
-    public float shakeMagnitude = 0.1f;
+    [SerializeField] private Camera targetCamera;
+    [SerializeField] private float shakeDuration = 0.2f;
+    [SerializeField] private float shakeMagnitude = 0.1f;
+    [SerializeField] private AnimationCurve shakeDampingCurve = AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
+
+    [Header("Screen Flash")]
+    [SerializeField] private Image flashImage;
+    [SerializeField] private float flashDuration = 0.12f;
+    [SerializeField] private Color flashColor = new Color(1f, 0.2f, 0f, 0.45f);
+    [SerializeField] private AnimationCurve flashAlphaCurve = AnimationCurve.EaseInOut(0f, 1f, 1f, 0f);
 
     [Header("Floating Text")]
-    public GameObject floatingTextPrefab;
-    public Transform floatingTextSpawnPoint;
+    [SerializeField] private GameObject floatingTextPrefab;
+    [SerializeField] private Transform floatingTextSpawnPoint;
+    [SerializeField] private float floatingTextLifetime = 1f;
 
-    private Camera mainCamera;
-    private Vector3 originalCameraPos;
+    private Coroutine shakeCoroutine;
+    private Coroutine flashCoroutine;
+    private Vector3 cachedCameraLocalPosition;
+    private Color flashColorTransparent;
 
-    void Awake()
+    private void Awake()
     {
-        if (instance == null)
-        {
-            instance = this;
-        }
-        else
+        if (instance != null && instance != this)
         {
             Destroy(gameObject);
+            return;
         }
 
-        mainCamera = Camera.main;
+        instance = this;
 
-        // Setup objects if they are not assigned
-        if (blinkImage == null)
+        if (targetCamera == null)
         {
-            SetupBlinkImage();
+            targetCamera = GetComponentInParent<Camera>();
+        }
+
+        if (targetCamera == null)
+        {
+            targetCamera = Camera.main;
+        }
+
+        if (flashImage == null)
+        {
+            SetupFlashImage();
         }
 
         if (floatingTextPrefab == null)
@@ -54,41 +66,104 @@ public class PlayerFeedback : MonoBehaviour
                 floatingTextSpawnPoint = player.transform;
             }
         }
+
+        if (flashImage != null)
+        {
+            flashImage.raycastTarget = false;
+            flashColorTransparent = new Color(flashColor.r, flashColor.g, flashColor.b, 0f);
+            flashImage.color = flashColorTransparent;
+            flashImage.enabled = false;
+            flashImage.gameObject.SetActive(false);
+        }
     }
 
     public void TriggerEffects()
     {
-        StartCoroutine(Blink());
-        StartCoroutine(Shake());
+        TriggerShake();
+        TriggerFlash();
         ShowFloatingText();
     }
 
-    private IEnumerator Blink()
+    private void TriggerShake()
     {
-        if (blinkImage == null) yield break;
-        blinkImage.color = blinkColor;
-        blinkImage.enabled = true;
-        yield return new WaitForSeconds(blinkDuration);
-        blinkImage.enabled = false;
+        if (targetCamera == null)
+        {
+            targetCamera = Camera.main;
+            if (targetCamera == null)
+            {
+                Debug.LogWarning("PlayerFeedback: No camera assigned for shake effect.");
+                return;
+            }
+        }
+
+        if (shakeCoroutine != null)
+        {
+            StopCoroutine(shakeCoroutine);
+            targetCamera.transform.localPosition = cachedCameraLocalPosition;
+            shakeCoroutine = null;
+        }
+
+        cachedCameraLocalPosition = targetCamera.transform.localPosition;
+        shakeCoroutine = StartCoroutine(ShakeRoutine());
     }
 
-    private IEnumerator Shake()
+    private IEnumerator ShakeRoutine()
     {
-        originalCameraPos = mainCamera.transform.localPosition;
-        float elapsed = 0.0f;
+        float elapsed = 0f;
 
         while (elapsed < shakeDuration)
         {
-            float x = Random.Range(-1f, 1f) * shakeMagnitude;
-            float y = Random.Range(-1f, 1f) * shakeMagnitude;
+            float progress = elapsed / shakeDuration;
+            float damping = shakeDampingCurve.Evaluate(progress);
+            Vector2 offset = Random.insideUnitCircle * shakeMagnitude * damping;
 
-            mainCamera.transform.localPosition = new Vector3(originalCameraPos.x + x, originalCameraPos.y + y, originalCameraPos.z);
+            targetCamera.transform.localPosition = cachedCameraLocalPosition + new Vector3(offset.x, offset.y, 0f);
 
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             yield return null;
         }
 
-        mainCamera.transform.localPosition = originalCameraPos;
+        targetCamera.transform.localPosition = cachedCameraLocalPosition;
+        shakeCoroutine = null;
+    }
+
+    private void TriggerFlash()
+    {
+        if (flashImage == null)
+        {
+            return;
+        }
+
+        if (flashCoroutine != null)
+        {
+            StopCoroutine(flashCoroutine);
+            flashCoroutine = null;
+        }
+
+        flashCoroutine = StartCoroutine(FlashRoutine());
+    }
+
+    private IEnumerator FlashRoutine()
+    {
+        flashImage.gameObject.SetActive(true);
+        flashImage.enabled = true;
+
+        float elapsed = 0f;
+        while (elapsed < flashDuration)
+        {
+            float progress = elapsed / flashDuration;
+            float alphaScale = flashAlphaCurve.Evaluate(progress);
+
+            flashImage.color = new Color(flashColor.r, flashColor.g, flashColor.b, flashColor.a * alphaScale);
+
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        flashImage.color = flashColorTransparent;
+        flashImage.enabled = false;
+        flashImage.gameObject.SetActive(false);
+        flashCoroutine = null;
     }
 
     private void ShowFloatingText()
@@ -96,30 +171,34 @@ public class PlayerFeedback : MonoBehaviour
         if (floatingTextPrefab != null && floatingTextSpawnPoint != null)
         {
             GameObject textGO = Instantiate(floatingTextPrefab, floatingTextSpawnPoint.position, Quaternion.identity, floatingTextSpawnPoint);
-            Destroy(textGO, 1f);
+            Destroy(textGO, floatingTextLifetime);
         }
     }
 
-    private void SetupBlinkImage()
+    private void SetupFlashImage()
     {
-        Canvas canvas = FindObjectOfType<Canvas>();
+        Canvas canvas = GetComponentInParent<Canvas>();
+
         if (canvas == null)
         {
-            GameObject canvasGO = new GameObject("FeedbackCanvas");
-            canvas = canvasGO.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            canvasGO.AddComponent<CanvasScaler>();
-            canvasGO.AddComponent<GraphicRaycaster>();
+            canvas = FindObjectOfType<Canvas>();
         }
 
-        GameObject blinkGO = new GameObject("BlinkImage");
-        blinkGO.transform.SetParent(canvas.transform);
-        blinkImage = blinkGO.AddComponent<Image>();
-        blinkImage.color = new Color(1, 0, 0, 0.5f);
-        blinkImage.rectTransform.anchorMin = Vector2.zero;
-        blinkImage.rectTransform.anchorMax = Vector2.one;
-        blinkImage.rectTransform.sizeDelta = Vector2.zero;
-        blinkImage.enabled = false;
+        if (canvas == null)
+        {
+            return;
+        }
+
+        GameObject flashGO = new GameObject("CoinStealFlash", typeof(RectTransform), typeof(Image));
+        flashGO.transform.SetParent(canvas.transform, false);
+
+        flashImage = flashGO.GetComponent<Image>();
+        flashImage.rectTransform.anchorMin = Vector2.zero;
+        flashImage.rectTransform.anchorMax = Vector2.one;
+        flashImage.rectTransform.offsetMin = Vector2.zero;
+        flashImage.rectTransform.offsetMax = Vector2.zero;
+        flashImage.rectTransform.SetAsLastSibling();
+        flashImage.color = flashColor;
     }
 
     private void SetupFloatingTextPrefab()

@@ -99,7 +99,10 @@ public class NPCController : MonoBehaviour
             {
                 BackgroundMusic.instance.PlaySound(stealSound);
             }
-            PlayerFeedback.instance.TriggerEffects();
+            if (PlayerFeedback.instance != null)
+            {
+                PlayerFeedback.instance.TriggerEffects();
+            }
         }
     }
 }
