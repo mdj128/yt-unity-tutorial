@@ -25,7 +25,7 @@ The current build includes:
 ---
 
 ## 🛠️ Tools Used  
-- **Unity (2023.x/2024.x)** – core game engine  
+- **Unity (6.2)** – core game engine  
 - **Gemini CLI** – AI code generation  
 - **Rodin** – 3D asset creation  
 - **ElevenLabs** – AI-generated voice and sound effects  
@@ -38,15 +38,6 @@ The current build includes:
 2. Open the project in **Unity (2023.x or newer)**.  
 3. Make sure you’ve installed the required Unity modules (3D, URP).  
 4. Run the project in the editor or build it for your platform.  
-
----
-
-## 📺 YouTube Series  
-- **Part 1:** Intro & Player Setup → [Link]  
-- **Part 2:** Textures + Music → [Link]  
-- **Part 3:** Coin Collection System → [Link]  
-- **Part 4:** Coin Bandits (Enemy AI) → [Link]  
-- **Part 5:** Timer, Portal & Menu System (Game Loop) → [Link]  
 
 ---
 
