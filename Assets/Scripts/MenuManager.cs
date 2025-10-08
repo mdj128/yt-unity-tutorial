@@ -1,6 +1,9 @@
 
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using System.Collections.Generic;
 using TMPro;
 
 public class MenuManager : MonoBehaviour
@@ -10,6 +13,11 @@ public class MenuManager : MonoBehaviour
     public TextMeshProUGUI timerText;
     public TextMeshProUGUI levelMessageText;
 
+    [Header("Manual Click Detection")]
+    public GraphicRaycaster graphicRaycaster;
+    public GameObject startButton;
+    public GameObject quitButton;
+
     [Header("Game Objects")]
     public PlayerController playerController;
 
@@ -18,7 +26,6 @@ public class MenuManager : MonoBehaviour
     public int coinsToWin = 10;
 
     private bool isPaused;
-    private bool resumeRequested;
     private bool isGameOver;
     private float currentTime;
 
@@ -37,11 +44,10 @@ public class MenuManager : MonoBehaviour
     {
         if (isGameOver) return;
 
-        if (resumeRequested)
+        // Manual click detection as a workaround for EventSystem issues
+        if (isPaused && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
         {
-            resumeRequested = false;
-            ResumeGame();
-            return; // Return to avoid processing escape key on the same frame
+            HandleManualClick();
         }
 
         // Toggle pause state with the Escape key
@@ -60,6 +66,33 @@ public class MenuManager : MonoBehaviour
         if (!isPaused)
         {
             HandleTimer();
+        }
+    }
+
+    private void HandleManualClick()
+    {
+        Debug.Log("[DEBUG] Manual click detected while paused.");
+        if (graphicRaycaster == null) return;
+
+        PointerEventData pointerEventData = new PointerEventData(EventSystem.current);
+        pointerEventData.position = Mouse.current.position.ReadValue();
+        List<RaycastResult> results = new List<RaycastResult>();
+        graphicRaycaster.Raycast(pointerEventData, results);
+
+        foreach (RaycastResult result in results)
+        {
+            if (result.gameObject == startButton)
+            {
+                Debug.Log("[DEBUG] Manual raycast hit START button.");
+                StartGame();
+                return; // Exit after handling the click
+            }
+            if (result.gameObject == quitButton)
+            {
+                Debug.Log("[DEBUG] Manual raycast hit QUIT button.");
+                QuitGame();
+                return; // Exit after handling the click
+            }
         }
     }
 
@@ -100,6 +133,7 @@ public class MenuManager : MonoBehaviour
 
     private void EndLevel(string message)
     {
+        Debug.Log("[DEBUG] Ending Level. Message: " + message);
         isGameOver = true;
         Time.timeScale = 0f;
         if (playerController != null) playerController.enabled = false;
@@ -110,15 +144,21 @@ public class MenuManager : MonoBehaviour
             levelMessageText.text = message;
             levelMessageText.gameObject.SetActive(true);
         }
+
+        // Unlock the cursor
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     public void StartGame()
     {
-        resumeRequested = true;
+        Debug.Log("[DEBUG] StartGame() method was called.");
+        ResumeGame();
     }
 
     public void QuitGame()
     {
+        Debug.Log("[DEBUG] QuitGame() method was called.");
         // This will work in a built game, but not in the editor.
         #if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
@@ -129,17 +169,27 @@ public class MenuManager : MonoBehaviour
 
     private void PauseGame()
     {
+        Debug.Log("[DEBUG] Pausing game.");
         Time.timeScale = 0f;
         if (buttonsContainer != null) buttonsContainer.SetActive(true);
         if (playerController != null) playerController.enabled = false;
         isPaused = true;
+
+        // Unlock the cursor so it's visible and can be used with UI
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     private void ResumeGame()
     {
+        Debug.Log("[DEBUG] Resuming game.");
         Time.timeScale = 1f;
         if (buttonsContainer != null) buttonsContainer.SetActive(false);
         if (playerController != null) playerController.enabled = true;
         isPaused = false;
+
+        // Lock the cursor for gameplay
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 }
