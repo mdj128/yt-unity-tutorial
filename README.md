@@ -1,49 +1,54 @@
-# My project
+# Unity AI Game Dev Tutorial Series  
 
-A Unity project. This repository includes only the files needed for source control; transient build and cache folders are ignored.
+This repository contains the Unity project files used in my **YouTube tutorial series** where I build a 3D game step-by-step using Unity and AI-powered tools.  
 
-## Requirements
-- Unity: 6000.1.14f1
-- Optional: Git LFS for large/binary assets (models, textures, audio)
-
-## Getting Started
-- Open Unity Hub, add this folder, and open with Unity 6000.1.14f1.
-- Recommended: In Unity, set Asset Serialization to Force Text and enable Visible Meta Files (Edit -> Project Settings -> Editor). This improves diffs and merge behavior.
-
-## Build
-- Use File -> Build Settings to create builds for your target platform(s). Build outputs are ignored by Git.
-
-## Version Control Notes
-- Tracked: `Assets/`, `Packages/`, `ProjectSettings/` (and their `.meta` files).
-- Ignored: Unity caches (`Library/`, `Temp/`, `Obj/`), IDE files, and build artifacts. See `.gitignore` for details.
-
-### Optional: Git LFS (recommended)
-Large assets benefit from LFS to keep the repo lean.
-
-```bash
-# One-time, from the repo root
-git lfs install
-# Common Unity asset types
-git lfs track "*.psd" "*.tga" "*.tif" "*.png" "*.jpg" "*.jpeg" \
-               "*.wav" "*.mp3" "*.ogg" "*.fbx" "*.obj" "*.prefab" \
-               "*.anim" "*.controller" "*.mp4" "*.mov"
-# After tracking, commit the updated .gitattributes
-```
-
-## First Push
-If this folder isn’t a Git repo yet:
-
-```bash
-git init
-git add .
-git commit -m "Initial Unity project"
-# Replace URL with your remote (GitHub, GitLab, etc.)
-git branch -M main
-git remote add origin <your-remote-url>
-git push -u origin main
-```
+👉 Watch the full playlist here: https://www.youtube.com/watch?v=ihd4JaK9KeU&list=PLRwcZI5DW36sUxyxqFIJUS49h8VYzEd_y&pp=gAQB
 
 ---
-Notes:
-- This README was generated from the project’s `ProjectSettings/ProjectVersion.txt` to pin the Unity version.
-- Consider setting up Unity Smart Merge (UnityYAMLMerge) for better merges of `.unity` and `.prefab` files.
+
+## 🎮 About the Project  
+The goal of this series is to show how game development can be accelerated with AI tools — from generating assets, textures, and sounds, to helping with scripts and mechanics.  
+
+By following along, you’ll learn how to:  
+- Set up a 3D Unity project from scratch  
+- Use AI tools to create characters, animations, and sound effects  
+- Add core mechanics: player movement, coin collection, enemies, timers, menus  
+- Tie everything into a real **game loop**  
+
+The current build includes:  
+- **Player (Gary)** with movement & animations  
+- **Collectible coins** (with SFX and UI counter)  
+- **Bandit enemies** that chase and steal coins  
+- **Timer + Portal objective** (Part 5)  
+- **Basic menu system** (Start, Pause, Quit)  
+
+---
+
+## 🛠️ Tools Used  
+- **Unity (2023.x/2024.x)** – core game engine  
+- **Gemini CLI** – AI code generation  
+- **Rodin** – 3D asset creation  
+- **ElevenLabs** – AI-generated voice and sound effects  
+- **Suno** – background music  
+
+---
+
+## 🚀 Getting Started  
+1. Clone this repository or download the latest release zip.  
+2. Open the project in **Unity (2023.x or newer)**.  
+3. Make sure you’ve installed the required Unity modules (3D, URP).  
+4. Run the project in the editor or build it for your platform.  
+
+---
+
+## 📺 YouTube Series  
+- **Part 1:** Intro & Player Setup → [Link]  
+- **Part 2:** Textures + Music → [Link]  
+- **Part 3:** Coin Collection System → [Link]  
+- **Part 4:** Coin Bandits (Enemy AI) → [Link]  
+- **Part 5:** Timer, Portal & Menu System (Game Loop) → [Link]  
+
+---
+
+## ⚠️ Disclaimer  
+This project is for **educational purposes**. It’s not a polished game, but a prototype to demonstrate Unity workflows and AI-assisted development.  
