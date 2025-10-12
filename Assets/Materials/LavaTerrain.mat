@@ -26,16 +26,16 @@ Material:
     m_Ints: []
     m_Floats:
     - _BubbleContrast: 3.8
-    - _BubbleDensity: 1.6
+    - _BubbleDensity: 2
     - _Distortion: 0.55
     - _EmissionIntensity: 5
     - _FlowSpeed: 0.45
     - _RippleScale: 1.65
     - _RippleSpeed: 1.2
-    - _Tiling: 0.2
+    - _Tiling: 1
     m_Colors:
     - _CoolColor: {r: 0.011792451, g: 0.0014740564, b: 0, a: 1}
     - _FoamColor: {r: 0.46226418, g: 0.1934475, b: 0, a: 1}
-    - _HotColor: {r: 0.9529412, g: 0.19787313, b: 0.023529397, a: 1}
+    - _HotColor: {r: 0.9529412, g: 0.1279739, b: 0.023529397, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
