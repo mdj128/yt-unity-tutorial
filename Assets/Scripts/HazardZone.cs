@@ -6,6 +6,19 @@ public class HazardZone : MonoBehaviour
     [Tooltip("If enabled, the collider will be forced into trigger mode on reset to ensure the player passes through it.")]
     [SerializeField] private bool forceTriggerCollider = true;
 
+    [Header("Respawn Behaviour")]
+    [Tooltip("If enabled, the player will sink before being respawned (useful for lava).")]
+    [SerializeField] private bool sinkPlayerBeforeRespawn = false;
+
+    [SerializeField, Tooltip("Distance the player sinks when sink behaviour is enabled.")]
+    private float sinkDistance = 1.5f;
+
+    [SerializeField, Tooltip("Speed at which the player sinks.")]
+    private float sinkSpeed = 1f;
+
+    [SerializeField, Tooltip("Additional delay after sinking before respawn.")]
+    private float postSinkDelay = 0.5f;
+
     private Collider hazardCollider;
 
     private void Awake()
@@ -42,7 +55,14 @@ public class HazardZone : MonoBehaviour
 
         if (respawn != null)
         {
-            respawn.KillPlayer();
+            if (sinkPlayerBeforeRespawn)
+            {
+                respawn.SinkIntoLava(sinkDistance, sinkSpeed, postSinkDelay);
+            }
+            else
+            {
+                respawn.KillPlayer();
+            }
         }
     }
 

@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class MenuManager : MonoBehaviour
 {
@@ -20,6 +22,12 @@ public class MenuManager : MonoBehaviour
 
     [Header("Game Objects")]
     public PlayerController playerController;
+    public PlayerRespawn playerRespawn;
+
+    [Header("Scene Flow")]
+    [SerializeField] private string nextLevelSceneName = "Level2";
+    [SerializeField] private float levelCompleteDelay = 2f;
+    [SerializeField] private float failureMessageDuration = 2f;
 
     [Header("Settings")]
     public float timeLimit = 60f;
@@ -28,13 +36,21 @@ public class MenuManager : MonoBehaviour
     private bool isPaused;
     private bool isGameOver;
     private float currentTime;
+    private string defaultLevelMessage;
+    private Coroutine messageCoroutine;
 
     void Start()
     {
         currentTime = timeLimit;
         if (timerText != null) timerText.text = Mathf.CeilToInt(currentTime).ToString();
 
-        if (levelMessageText != null) levelMessageText.gameObject.SetActive(false);
+        if (levelMessageText != null)
+        {
+            defaultLevelMessage = levelMessageText.text;
+            levelMessageText.gameObject.SetActive(false);
+        }
+
+        EnsurePlayerRespawnReference();
         
         // Start the game in a paused state
         PauseGame();
@@ -102,10 +118,10 @@ public class MenuManager : MonoBehaviour
         {
             currentTime -= Time.deltaTime;
         }
-        else
+        if (currentTime <= 0)
         {
             currentTime = 0;
-            EndLevel("Time's up!");
+            HandleLevelFailure("Time's up!");
         }
 
         if (timerText != null) timerText.text = Mathf.CeilToInt(currentTime).ToString();
@@ -123,31 +139,15 @@ public class MenuManager : MonoBehaviour
 
         if (currentTime > 0 && currentCoins >= coinsToWin)
         {
-            EndLevel("You beat level 1!");
+            if (!isGameOver)
+            {
+                StartCoroutine(LevelCompleteRoutine("You beat level 1!"));
+            }
         }
         else if (currentTime > 0 && currentCoins < coinsToWin)
         {
-            EndLevel("You need at least " + coinsToWin + " coins to win!");
+            HandleLevelFailure("You need at least " + coinsToWin + " coins to win!");
         }
-    }
-
-    private void EndLevel(string message)
-    {
-        Debug.Log("[DEBUG] Ending Level. Message: " + message);
-        isGameOver = true;
-        Time.timeScale = 0f;
-        if (playerController != null) playerController.enabled = false;
-        if (buttonsContainer != null) buttonsContainer.SetActive(false);
-
-        if (levelMessageText != null)
-        {
-            levelMessageText.text = message;
-            levelMessageText.gameObject.SetActive(true);
-        }
-
-        // Unlock the cursor
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
     }
 
     public void StartGame()
@@ -172,6 +172,14 @@ public class MenuManager : MonoBehaviour
         Debug.Log("[DEBUG] Pausing game.");
         Time.timeScale = 0f;
         if (buttonsContainer != null) buttonsContainer.SetActive(true);
+        if (levelMessageText != null)
+        {
+            if (messageCoroutine == null && !string.IsNullOrEmpty(defaultLevelMessage))
+            {
+                levelMessageText.text = defaultLevelMessage;
+            }
+            levelMessageText.gameObject.SetActive(true);
+        }
         if (playerController != null) playerController.enabled = false;
         isPaused = true;
 
@@ -185,11 +193,111 @@ public class MenuManager : MonoBehaviour
         Debug.Log("[DEBUG] Resuming game.");
         Time.timeScale = 1f;
         if (buttonsContainer != null) buttonsContainer.SetActive(false);
+        if (levelMessageText != null && !isGameOver && messageCoroutine == null)
+        {
+            levelMessageText.gameObject.SetActive(false);
+        }
         if (playerController != null) playerController.enabled = true;
         isPaused = false;
 
         // Lock the cursor for gameplay
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+    }
+
+    private void EnsurePlayerRespawnReference()
+    {
+        if (playerRespawn != null) return;
+
+        if (playerController != null)
+        {
+            playerRespawn = playerController.GetComponent<PlayerRespawn>();
+            if (playerRespawn == null)
+            {
+                playerRespawn = playerController.GetComponentInParent<PlayerRespawn>();
+            }
+        }
+
+        if (playerRespawn == null)
+        {
+            playerRespawn = FindObjectOfType<PlayerRespawn>();
+            if (playerRespawn == null)
+            {
+                Debug.LogWarning("[DEBUG] MenuManager could not automatically locate PlayerRespawn.");
+            }
+        }
+    }
+
+    private void HandleLevelFailure(string message)
+    {
+        Debug.Log("[DEBUG] Level failure: " + message);
+
+        currentTime = timeLimit;
+        if (timerText != null) timerText.text = Mathf.CeilToInt(currentTime).ToString();
+
+        ShowTemporaryMessage(message, failureMessageDuration);
+
+        if (playerRespawn != null)
+        {
+            playerRespawn.KillPlayer();
+        }
+        else
+        {
+            Debug.LogWarning("[DEBUG] PlayerRespawn reference is missing; cannot respawn player.");
+        }
+    }
+
+    private void ShowTemporaryMessage(string message, float duration)
+    {
+        if (levelMessageText == null) return;
+
+        if (messageCoroutine != null)
+        {
+            StopCoroutine(messageCoroutine);
+        }
+
+        messageCoroutine = StartCoroutine(ShowTemporaryMessageRoutine(message, duration));
+    }
+
+    private IEnumerator ShowTemporaryMessageRoutine(string message, float duration)
+    {
+        levelMessageText.text = message;
+        levelMessageText.gameObject.SetActive(true);
+        yield return new WaitForSecondsRealtime(duration);
+        levelMessageText.text = defaultLevelMessage;
+        if (!isPaused)
+        {
+            levelMessageText.gameObject.SetActive(false);
+        }
+        messageCoroutine = null;
+    }
+
+    private IEnumerator LevelCompleteRoutine(string message)
+    {
+        isGameOver = true;
+        Time.timeScale = 0f;
+
+        if (buttonsContainer != null) buttonsContainer.SetActive(false);
+        if (playerController != null) playerController.enabled = false;
+
+        if (levelMessageText != null)
+        {
+            if (messageCoroutine != null)
+            {
+                StopCoroutine(messageCoroutine);
+                messageCoroutine = null;
+            }
+            levelMessageText.text = message;
+            levelMessageText.gameObject.SetActive(true);
+        }
+
+        // Unlock the cursor
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        yield return new WaitForSecondsRealtime(Mathf.Max(0f, levelCompleteDelay));
+
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(nextLevelSceneName);
     }
 }
