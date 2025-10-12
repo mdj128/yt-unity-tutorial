@@ -14,10 +14,6 @@ public class LavaStoneFish : MonoBehaviour
     [Header("Player Interaction")]
     [SerializeField, Tooltip("Layers considered valid player targets when applying knockback.")]
     private LayerMask playerLayers = ~0;
-    [SerializeField, Tooltip("If true, knockback only applies when a detectable player is within range; otherwise every leap is active.")]
-    private bool requirePlayerProximity = true;
-    [SerializeField, Tooltip("Radius tested around the fish before each jump when proximity checks are enabled.")]
-    private float playerDetectionRadius = 4f;
 
     [Header("Jump Timing")]
     [SerializeField, Tooltip("Minimum delay (seconds) between jumps.")]
@@ -91,12 +87,6 @@ public class LavaStoneFish : MonoBehaviour
 
     private IEnumerator JumpRoutine()
     {
-        if (requirePlayerProximity && !IsPlayerClose())
-        {
-            ScheduleNextJump();
-            yield break;
-        }
-
         isJumping = true;
         hitPlayersThisJump.Clear();
 
@@ -157,17 +147,6 @@ public class LavaStoneFish : MonoBehaviour
         {
             nextJumpTime = Time.time + Random.Range(minJumpInterval, maxJumpInterval);
         }
-    }
-
-    private bool IsPlayerClose()
-    {
-        if (requirePlayerProximity)
-        {
-            Collider[] hits = Physics.OverlapSphere(cachedTransform.position, playerDetectionRadius, playerLayers, QueryTriggerInteraction.Ignore);
-            return hits.Length > 0;
-        }
-
-        return true;
     }
 
     private void CheckForPlayerHits()

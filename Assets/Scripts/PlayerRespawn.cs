@@ -101,15 +101,15 @@ public class PlayerRespawn : MonoBehaviour
     {
         isRespawning = true;
 
-        if (movementController != null)
-        {
-            movementController.PausePlayer(PauseModes.MakeKinematic);
-        }
-
         if (controllerRigidbody != null)
         {
             controllerRigidbody.linearVelocity = Vector3.zero;
             controllerRigidbody.angularVelocity = Vector3.zero;
+        }
+
+        if (movementController != null)
+        {
+            movementController.PausePlayer(PauseModes.MakeKinematic);
         }
 
         if (respawnDelay > 0f)
@@ -151,12 +151,12 @@ public class PlayerRespawn : MonoBehaviour
 
         if (controllerRigidbody != null)
         {
+            controllerRigidbody.linearVelocity = Vector3.zero;
+            controllerRigidbody.angularVelocity = Vector3.zero;
             prevIsKinematic = controllerRigidbody.isKinematic;
             prevConstraints = controllerRigidbody.constraints;
             controllerRigidbody.isKinematic = true;
             controllerRigidbody.constraints = RigidbodyConstraints.FreezeRotation;
-            controllerRigidbody.linearVelocity = Vector3.zero;
-            controllerRigidbody.angularVelocity = Vector3.zero;
         }
 
         bool colliderDisabled = false;
@@ -174,12 +174,6 @@ public class PlayerRespawn : MonoBehaviour
             float step = Mathf.Min(sinkSpeed * Time.deltaTime, sinkDistance - sunk);
             transform.position += Vector3.down * step;
             sunk += step;
-
-            if (controllerRigidbody != null)
-            {
-                controllerRigidbody.linearVelocity = Vector3.zero;
-                controllerRigidbody.angularVelocity = Vector3.zero;
-            }
 
             feedbackTimer += Time.deltaTime;
             if (lavaFeedbackInterval > 0f && feedbackTimer >= lavaFeedbackInterval)
@@ -215,8 +209,11 @@ public class PlayerRespawn : MonoBehaviour
         {
             controllerRigidbody.isKinematic = prevIsKinematic;
             controllerRigidbody.constraints = prevConstraints;
-            controllerRigidbody.linearVelocity = Vector3.zero;
-            controllerRigidbody.angularVelocity = Vector3.zero;
+            if (!controllerRigidbody.isKinematic)
+            {
+                controllerRigidbody.linearVelocity = Vector3.zero;
+                controllerRigidbody.angularVelocity = Vector3.zero;
+            }
         }
 
         SetBurningState(false);
@@ -246,8 +243,15 @@ public class PlayerRespawn : MonoBehaviour
 
         if (controllerRigidbody != null)
         {
-            controllerRigidbody.linearVelocity = Vector3.zero;
-            controllerRigidbody.angularVelocity = Vector3.zero;
+            if (!controllerRigidbody.isKinematic)
+            {
+                controllerRigidbody.linearVelocity = Vector3.zero;
+                controllerRigidbody.angularVelocity = Vector3.zero;
+            }
+            else
+            {
+                controllerRigidbody.Sleep();
+            }
         }
     }
 
