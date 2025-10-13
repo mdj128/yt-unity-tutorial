@@ -121,15 +121,21 @@ public class SUPERCharacterAIO : MonoBehaviour{
 
     //Jumping
     public bool canJump=true,holdJump=false, jumpEnhancements=true, Jumped;
-    #if ENABLE_INPUT_SYSTEM
+#if ENABLE_INPUT_SYSTEM
         public Key jumpKey = Key.Space;
-    #else
+#else
         public KeyCode jumpKey_L  = KeyCode.Space;
-    #endif
+#endif
     [Range(1.0f,650.0f)] public float jumpPower = 40;
     [Range(0.0f,1.0f)] public float airControlFactor = 1;
     public float decentMultiplier = 2.5f, tapJumpMultiplier = 2.1f;
+    [Header("Air Jump Settings")]
+    [Tooltip("Number of extra jumps available while airborne.")]
+    public int additionalAirJumps = 0;
+    [Tooltip("Multiplier applied to jump force for air jumps.")]
+    public float airJumpForceMultiplier = 1.0f;
     float jumpBlankingPeriod;
+    int airJumpsRemaining;
 
     //Sliding
     public bool isSliding, canSlide = true;
@@ -307,6 +313,8 @@ public class SUPERCharacterAIO : MonoBehaviour{
             Cursor.lockState = CursorLockMode.Locked;
             Cursor.visible = false;
         }
+
+        airJumpsRemaining = additionalAirJumps;
 
         if(autoGenerateCrosshair || drawPrimitiveUI){
                 Canvas canvas = playerCamera.gameObject.GetComponentInChildren<Canvas>();
@@ -874,20 +882,34 @@ public class SUPERCharacterAIO : MonoBehaviour{
         
     }
     void Jump(float Force){
-        if((currentGroundInfo.isInContactWithGround) && 
+        bool canUseGroundJump = (currentGroundInfo.isInContactWithGround) && 
             (currentGroundInfo.groundAngle<hardSlopeLimit) && 
             ((enableStaminaSystem && jumpingDepletesStamina)? currentStaminaLevel>s_JumpStaminaDepletion*1.2f : true) && 
             (Time.time>(jumpBlankingPeriod+0.1f)) &&
-            (currentStance == Stances.Standing && !Jumped)){
+            (currentStance == Stances.Standing && !Jumped);
 
-                Jumped = true;
-                p_Rigidbody.linearVelocity =(Vector3.right * p_Rigidbody.linearVelocity.x) + (Vector3.forward * p_Rigidbody.linearVelocity.z);
-                p_Rigidbody.AddForce(Vector3.up*(Force/10),ForceMode.Impulse);
-                if(enableStaminaSystem && jumpingDepletesStamina){
-                    InstantStaminaReduction(s_JumpStaminaDepletion);
-                }
-                capsule.sharedMaterial  = _ZeroFriction;
-                jumpBlankingPeriod = Time.time;
+        if(canUseGroundJump){
+            Jumped = true;
+            p_Rigidbody.linearVelocity =(Vector3.right * p_Rigidbody.linearVelocity.x) + (Vector3.forward * p_Rigidbody.linearVelocity.z);
+            p_Rigidbody.AddForce(Vector3.up*(Force/10),ForceMode.Impulse);
+            if(enableStaminaSystem && jumpingDepletesStamina){
+                InstantStaminaReduction(s_JumpStaminaDepletion);
+            }
+            capsule.sharedMaterial  = _ZeroFriction;
+            jumpBlankingPeriod = Time.time;
+            airJumpsRemaining = additionalAirJumps;
+        }
+        else if(!currentGroundInfo.isInContactWithGround && additionalAirJumps > 0 && airJumpsRemaining > 0 && Time.time>(jumpBlankingPeriod+0.1f))
+        {
+            Jumped = true;
+            p_Rigidbody.linearVelocity =(Vector3.right * p_Rigidbody.linearVelocity.x) + (Vector3.forward * p_Rigidbody.linearVelocity.z);
+            p_Rigidbody.AddForce(Vector3.up*(Force/10)*airJumpForceMultiplier,ForceMode.Impulse);
+            if(enableStaminaSystem && jumpingDepletesStamina){
+                InstantStaminaReduction(s_JumpStaminaDepletion);
+            }
+            capsule.sharedMaterial  = _ZeroFriction;
+            jumpBlankingPeriod = Time.time;
+            airJumpsRemaining--;
         }
     }
     public void DoJump(float Force = 10.0f){
@@ -961,6 +983,7 @@ public class SUPERCharacterAIO : MonoBehaviour{
         
         if(Jumped && (Physics.Raycast(transform.position, Vector3.down, (capsule.height/2)+0.1f,whatIsGround)||Physics.CheckSphere(transform.position-(Vector3.up*((capsule.height/2)-(capsule.radius-0.05f))),capsule.radius,whatIsGround)) &&Time.time>(jumpBlankingPeriod+0.1f)){
             Jumped=false;
+            airJumpsRemaining = additionalAirJumps;
         }
         
         //if(Result.isGrounded){
@@ -1841,6 +1864,8 @@ public class SuperFPEditor : Editor{
             t.holdJump = EditorGUILayout.ToggleLeft(new GUIContent("Continuous Jumping", "Should the player be able to continue jumping without letting go of the Jump key"),t.holdJump);
             t.jumpPower = EditorGUILayout.Slider(new GUIContent("Jump Power", "How much power should a jump have?"),t.jumpPower,1,650f);
             t.airControlFactor = EditorGUILayout.Slider(new GUIContent("Air Control Factor", "EXPERIMENTAL: How much control should the player have over their direction while in the air"),t.airControlFactor,0,1);
+            t.additionalAirJumps = EditorGUILayout.IntSlider(new GUIContent("Additional Air Jumps", "How many extra jumps are allowed while airborne."),t.additionalAirJumps,0,5);
+            t.airJumpForceMultiplier = EditorGUILayout.Slider(new GUIContent("Air Jump Force Multiplier", "Scale the jump power for air jumps."),t.airJumpForceMultiplier,0.1f,2f);
             GUI.enabled = t.enableStaminaSystem;
                 t.jumpingDepletesStamina = EditorGUILayout.ToggleLeft(new GUIContent("Jumping Depletes Stamina", "Should jumping deplete stamina?"),t.jumpingDepletesStamina);
                 t.s_JumpStaminaDepletion = EditorGUILayout.Slider(new GUIContent("Jump Stamina Depletion Amount", "How much stamina should jumping use?"),t.s_JumpStaminaDepletion, 0, t.Stamina);
