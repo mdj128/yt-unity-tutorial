@@ -5096,8 +5096,8 @@ MonoBehaviour:
   apexHangTime: 0
   descentDuration: 0.5
   restingDepthOffset: 0
-  impactRadius: 1.1
-  knockbackForce: 7.5
+  impactRadius: 2
+  knockbackForce: 15
   knockbackUpwardBias: 0.65
   visualRoot: {fileID: 0}
   flipAxis: {x: 0, y: 0, z: 1}
@@ -5374,7 +5374,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7215790196825558260, guid: a5ff46c11fcd1114a85e41ed0ed0cc9d, type: 3}
       propertyPath: holdJump
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7215790196825558260, guid: a5ff46c11fcd1114a85e41ed0ed0cc9d, type: 3}
       propertyPath: airControlFactor
@@ -5387,6 +5387,14 @@ PrefabInstance:
     - target: {fileID: 7215790196825558260, guid: a5ff46c11fcd1114a85e41ed0ed0cc9d, type: 3}
       propertyPath: maxCameraDistance
       value: 5.29
+      objectReference: {fileID: 0}
+    - target: {fileID: 7215790196825558260, guid: a5ff46c11fcd1114a85e41ed0ed0cc9d, type: 3}
+      propertyPath: additionalAirJumps
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7215790196825558260, guid: a5ff46c11fcd1114a85e41ed0ed0cc9d, type: 3}
+      propertyPath: airJumpForceMultiplier
+      value: 1.01
       objectReference: {fileID: 0}
     - target: {fileID: 7215790196825558260, guid: a5ff46c11fcd1114a85e41ed0ed0cc9d, type: 3}
       propertyPath: inputResponseFiltering
